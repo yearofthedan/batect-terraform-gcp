@@ -1,4 +1,5 @@
 .idea
-envSource.sh
 .terraform
 */**.tfplan
+secret
+.DS_Store

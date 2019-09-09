@@ -17,17 +17,17 @@ containers:
         options: cached
     working_directory: /code
 
-  heroku:
-    build_directory: ./heroku
+  gcp:
+    build_directory: ./gcp
     volumes:
-      - local: ./heroku
-        container: /heroku
+      - local: ./gcp
+        container: /main
         options: cached
-    working_directory: /heroku
+      - local: ./secret
+        container: /secret
+    working_directory: /main
     environment:
-      WEB_APP: ${WEB_APP}
-      TERRAFORM_STATE_APP: ${TERRAFORM_STATE_APP}
-      HEROKU_API_KEY: ${HEROKU_API_KEY}
+      PROJECT_NAME: ${PROJECT_NAME}
 
   terraform:
     build_directory: ./terraform
@@ -37,6 +37,7 @@ containers:
         options: cached
     working_directory: /app/terraform
     environment:
+      PROJECT_NAME: ${PROJECT_NAME}
       WEB_APP: ${WEB_APP}
       HEROKU_API_KEY: ${HEROKU_API_KEY}
       TERRAFORM_REMOTE_DB_URL: ${TERRAFORM_REMOTE_DB_URL}
@@ -84,17 +85,10 @@ containers:
 tasks:
   setup-terraform-remote:
     group: Terraform Infra
-    description: Setup an app in heroku for storing remote terraform state
+    description: Setup a bucket in gcp for terraform remote state
     run:
-      container: heroku
+      container: gcp
       command: sh -c './setupTerraformRemoteStorage.sh'
-
-  get-database-url:
-    group: Terraform Infra
-    description: Get the database url
-    run:
-      container: heroku
-      command: sh -c './getTerraformRemoteConnectionUrl.sh'
 
   init-terraform-with-remote:
     group: Infra
@@ -110,7 +104,7 @@ tasks:
       - init-terraform-with-remote
     run:
       container: terraform
-      command: sh -c 'terraform plan -var web_app_name="$WEB_APP" -out=current.tfplan'
+      command: sh -c 'terraform plan -var project_name="$PROJECT_NAME" -out=current.tfplan'
 
   apply-web-infra:
     group: Infra
@@ -141,14 +135,14 @@ tasks:
     run:
       container: build-env-server
       command: sh -c 'yarn'
-
+# TODO Update away from heroku
   push-image:
     description: Dockerise and push the image to Heroku.
     group: Deploy
     run:
       container: docker-push-env
       command: ./deploy/buildAndPushImage.sh
-
+# TODO Update away from heroku
   deploy:
     description: Tell heroku to deploy the new version
     group: Deploy

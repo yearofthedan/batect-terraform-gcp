@@ -49,12 +49,16 @@ containers:
       - local: .
         container: /code
         options: cached
+      - local: ./secret
+        container: /secret
       - local: /var/run/docker.sock
         container: /var/run/docker.sock
     working_directory: /code
     environment:
+      PROJECT_NAME: ${PROJECT_NAME}
       WEB_APP: ${WEB_APP}
       HEROKU_API_KEY: ${HEROKU_API_KEY}
+      IMAGE_PATH: gcr:io/${PROJECT_NAME}/${IMAGE_NAME}/web
 
   nginx-serving-assets:
     build_directory: ./app
@@ -135,13 +139,14 @@ tasks:
     run:
       container: build-env-server
       command: sh -c 'yarn'
-# TODO Update away from heroku
+
   push-image:
     description: Dockerise and push the image to Heroku.
     group: Deploy
     run:
       container: docker-push-env
       command: ./deploy/buildAndPushImage.sh
+
 # TODO Update away from heroku
   deploy:
     description: Tell heroku to deploy the new version

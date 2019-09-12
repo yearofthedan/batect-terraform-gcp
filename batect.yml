@@ -1,4 +1,4 @@
-project_name: terraform-batect-heroku
+project_name: terraform-batect-gcp
 
 containers:
   build-env-client-app:
@@ -17,17 +17,18 @@ containers:
         options: cached
     working_directory: /code
 
-  gcp:
+  google-cloud:
     build_directory: ./gcp
     volumes:
-      - local: ./gcp
-        container: /main
+      - local: .
+        container: /code
         options: cached
       - local: ./secret
         container: /secret
-    working_directory: /main
+    working_directory: /code
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
+      CLUSTER_NAME: ${CLUSTER_NAME}
 
   terraform:
     build_directory: ./terraform
@@ -39,7 +40,6 @@ containers:
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
       WEB_APP: ${WEB_APP}
-      HEROKU_API_KEY: ${HEROKU_API_KEY}
       TERRAFORM_REMOTE_DB_URL: ${TERRAFORM_REMOTE_DB_URL}
 
   docker-push-env:
@@ -57,7 +57,6 @@ containers:
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
       WEB_APP: ${WEB_APP}
-      HEROKU_API_KEY: ${HEROKU_API_KEY}
       IMAGE_PATH: gcr:io/${PROJECT_NAME}/${IMAGE_NAME}/web
 
   nginx-serving-assets:
@@ -85,14 +84,13 @@ containers:
     ports:
      - 3000:3000
 
-
 tasks:
   setup-terraform-remote:
     group: Terraform Infra
     description: Setup a bucket in gcp for terraform remote state
     run:
-      container: gcp
-      command: sh -c './setupTerraformRemoteStorage.sh'
+      container: google-cloud
+      command: sh -c './gcp/setupTerraformRemoteStorage.sh'
 
   init-terraform-with-remote:
     group: Infra
@@ -141,19 +139,22 @@ tasks:
       command: sh -c 'yarn'
 
   push-image:
-    description: Dockerise and push the image to Heroku.
+    description: Build and push the image
     group: Deploy
     run:
       container: docker-push-env
       command: ./deploy/buildAndPushImage.sh
+      environment:
+        IMAGE_NAME: web
 
-# TODO Update away from heroku
   deploy:
     description: Tell heroku to deploy the new version
     group: Deploy
     run:
-      container: heroku
-      command: sh -c 'heroku container:release --app "$WEB_APP" web'
+      container: google-cloud
+      command: ./deploy/deploy.sh
+      environment:
+        IMAGE_NAME: web
 
   local-app:
     description: Start the application.

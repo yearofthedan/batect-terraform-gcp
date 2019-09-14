@@ -54,7 +54,6 @@ containers:
     working_directory: /code
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
-      IMAGE_PATH: gcr:io/${PROJECT_NAME}/${IMAGE_NAME}/web
 
   nginx-serving-assets:
     build_directory: ./app

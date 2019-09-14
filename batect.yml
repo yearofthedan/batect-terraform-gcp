@@ -38,7 +38,6 @@ containers:
     working_directory: /app/terraform
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
-      WEB_APP: ${WEB_APP}
       TERRAFORM_STATE_STORE: ${TERRAFORM_STATE_STORE}
 
   docker-push-env:
@@ -55,7 +54,6 @@ containers:
     working_directory: /code
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
-      WEB_APP: ${WEB_APP}
       IMAGE_PATH: gcr:io/${PROJECT_NAME}/${IMAGE_NAME}/web
 
   nginx-serving-assets:
@@ -143,7 +141,7 @@ tasks:
         IMAGE_NAME: web
 
   deploy:
-    description: Tell heroku to deploy the new version
+    description: Deploy the new version to the cluster
     group: Deploy
     run:
       container: google-cloud

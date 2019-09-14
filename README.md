@@ -1,6 +1,6 @@
-###  Batect - nginx hosted app on heroku with terraform
+###  Batect - nginx hosted app on gcp with terraform
 Requires some environment variables to be provided. I used a git ignored envSource.sh for mine. 
 
-`WEB_APP` the name of the app to be hosted in heroku
-`TERRAFORM_STATE_APP` the name of the app just holding the terraform state in heroku
-`TERRAFORM_REMOTE_DB_URL` where we'll be storing the terraform state. You can get this after the pg db has been created 
+`PROJECT_NAME` the name of the project. Used for creating infra.
+`CLUSTER_NAME` the name of the cluster to be deployed to. Shared across infra and deploy scripts.
+`TERRAFORM_STATE_STORE` the name of the terraform store. Refers to the bucket in gcp for creating, and future use. 

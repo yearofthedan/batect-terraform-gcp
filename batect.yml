@@ -28,7 +28,6 @@ containers:
     working_directory: /code
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
-      CLUSTER_NAME: ${CLUSTER_NAME}
 
   terraform:
     build_directory: ./terraform
@@ -40,7 +39,7 @@ containers:
     environment:
       PROJECT_NAME: ${PROJECT_NAME}
       WEB_APP: ${WEB_APP}
-      TERRAFORM_REMOTE_DB_URL: ${TERRAFORM_REMOTE_DB_URL}
+      TERRAFORM_STATE_STORE: ${TERRAFORM_STATE_STORE}
 
   docker-push-env:
     build_directory: .
@@ -106,7 +105,9 @@ tasks:
       - init-terraform-with-remote
     run:
       container: terraform
-      command: sh -c 'terraform plan -var project_name="$PROJECT_NAME" -out=current.tfplan'
+      command: sh -c 'terraform plan -var project_name="$PROJECT_NAME" -var cluster_name="$CLUSTER_NAME" -out=current.tfplan'
+      environment:
+        CLUSTER_NAME: ${CLUSTER_NAME}
 
   apply-web-infra:
     group: Infra
@@ -155,6 +156,7 @@ tasks:
       command: ./deploy/deploy.sh
       environment:
         IMAGE_NAME: web
+        CLUSTER_NAME: ${CLUSTER_NAME}
 
   local-app:
     description: Start the application.

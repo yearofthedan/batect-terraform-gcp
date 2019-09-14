@@ -99,7 +99,7 @@ tasks:
       container: terraform
       command: sh -c './initialiseTerraform.sh'
 
-  plan-web-infra:
+  plan-infra:
     group: Infra
     description: Plan for creating the infra for the web app
     prerequisites:
@@ -110,7 +110,7 @@ tasks:
       environment:
         CLUSTER_NAME: ${CLUSTER_NAME}
 
-  apply-web-infra:
+  apply-infra:
     group: Infra
     description: Create the infra for the web app
     prerequisites:
@@ -119,12 +119,12 @@ tasks:
       container: terraform
       command: sh -c 'terraform apply current.tfplan'
 
-  destroy-web-infra:
+  destroy-infra:
     group: Infra
     description: Remove the infra for the web app
     run:
       container: terraform
-      command: sh -c 'terraform destroy -var web_app_name="$WEB_APP"'
+      command: sh -c 'terraform destroy -var project_name="$PROJECT_NAME" -var cluster_name="$CLUSTER_NAME"'
 
   build-client-app:
     description: Build the web assets
@@ -151,6 +151,7 @@ tasks:
       environment:
         IMAGE_NAME: web
         CLUSTER_NAME: ${CLUSTER_NAME}
+        PORT: 4567
 
   local-app:
     description: Start the application.

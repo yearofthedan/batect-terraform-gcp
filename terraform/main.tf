@@ -16,13 +16,38 @@ provider "google" {
   region      = "us-west1"
 }
 
-resource "google_container_cluster" "gke-cluster" {
+resource "google_container_cluster" "primary" {
   name               = "${var.cluster_name}"
-  network            = "default"
   location           = "us-west1-a"
-  initial_node_count = 3
+  remove_default_node_pool = true
+  initial_node_count = 1
+
+  master_auth {
+      username = ""
+      password = ""
+
+      client_certificate_config {
+        issue_client_certificate = false
+      }
+  }
+}
+
+resource "google_container_node_pool" "primary_preemptible_nodes" {
+  name       = "node-pool"
+  location   = "us-west1-a"
+  cluster    = "${var.cluster_name}"
+  node_count = 2
+  autoscaling {
+    max_node_count = 6
+    min_node_count = 2
+  }
 
   node_config {
-      machine_type = "f1-micro"
+    preemptible  = true
+    machine_type = "g1-small"
+
+    metadata = {
+      disable-legacy-endpoints = "true"
+    }
   }
 }

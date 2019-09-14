@@ -68,7 +68,8 @@ containers:
     environment:
       PORT: "4567"
     ports:
-      - 4567:4567
+      - local: 4567
+        container: 80
 
   express-backend:
     build_directory: ./server
@@ -132,13 +133,6 @@ tasks:
       container: build-env-client-app
       command: sh -c 'yarn && yarn build'
 
-  build-server:
-    description: Build the backend server
-    group: Build
-    run:
-      container: build-env-server
-      command: sh -c 'yarn'
-
   push-image:
     description: Build and push the image
     group: Deploy
@@ -167,6 +161,13 @@ tasks:
       - express-backend
     run:
       container: nginx-serving-assets
+
+  build-server:
+    description: Build the backend server
+    group: Build
+    run:
+      container: build-env-server
+      command: sh -c 'yarn'
 
   local-server:
     description: Start just the backend

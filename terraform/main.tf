@@ -20,7 +20,7 @@ resource "google_container_cluster" "gke-cluster" {
   name               = "${var.cluster_name}"
   network            = "default"
   location           = "us-west1-a"
-  initial_node_count = 2
+  initial_node_count = 3
 
   node_config {
       machine_type = "f1-micro"

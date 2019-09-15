@@ -5,14 +5,12 @@ IMAGE_NAME=web
 TAG=$(git rev-parse HEAD)
 IMAGE_PATH=gcr.io/"$PROJECT_NAME"/"$IMAGE_NAME":"$TAG"
 
-echo Activating gcloud
+echo Activating gcloud with k8s
 gcloud config set project "${PROJECT_NAME}"
 gcloud auth activate-service-account --key-file /secret/service-account.json
-
 gcloud container clusters get-credentials "${CLUSTER_NAME}" --region us-west1-a
 
-echo Deploying with kubectl
-
-kubectl create deployment "${CLUSTER_NAME}-web" --image="$IMAGE_PATH"
-kubectl expose deployment "${CLUSTER_NAME}-web" --type=LoadBalancer --port 80 --target-port "$PORT"
+echo Deploying update via kubectl for image: "$IMAGE_PATH"
+# shellcheck disable=SC2002
+cat ./deploy/app-deployment.yml | sed "s~{{IMAGE_PATH}}~$IMAGE_PATH~g" | kubectl apply -f -
 kubectl get service

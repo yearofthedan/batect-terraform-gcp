@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-app-deployment
+spec:
+  selector:
+    matchLabels:
+      app: web-app
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: web-app
+        env: development
+    spec:
+      containers:
+        - name: web-app
+          image: {{IMAGE_PATH}}
+          ports:
+            - containerPort: 4567
+          env:
+            - name: PORT
+              value: "4567"
+            - name: LOG_LEVEL
+              value: "info"
+            - name: NODE_ENV
+              value: "development"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-app-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 80
+      targetPort: 4567
+      protocol: TCP
+  selector:
+    app: web-app

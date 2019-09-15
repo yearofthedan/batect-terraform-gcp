@@ -63,9 +63,9 @@ containers:
         container: /app
         options: cached
     environment:
-      PORT: "4567"
+      PORT: "80"
     ports:
-      - local: 4567
+      - local: 80
         container: 80
 
   express-backend:
@@ -148,7 +148,7 @@ tasks:
       environment:
         IMAGE_NAME: web
         CLUSTER_NAME: ${CLUSTER_NAME}
-        PORT: 4567
+        PORT: 80
 
   local-app:
     description: Start the application.

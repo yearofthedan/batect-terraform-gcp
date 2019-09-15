@@ -17,10 +17,10 @@ spec:
         - name: web-app
           image: {{IMAGE_PATH}}
           ports:
-            - containerPort: 4567
+            - containerPort: 80
           env:
             - name: PORT
-              value: "4567"
+              value: "80"
             - name: LOG_LEVEL
               value: "info"
             - name: NODE_ENV
@@ -34,7 +34,7 @@ spec:
   type: LoadBalancer
   ports:
     - port: 80
-      targetPort: 4567
+      targetPort: 80
       protocol: TCP
   selector:
     app: web-app

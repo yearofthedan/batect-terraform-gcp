@@ -148,7 +148,8 @@ tasks:
       environment:
         IMAGE_NAME: web
         CLUSTER_NAME: ${CLUSTER_NAME}
-        PORT: 80
+        LB_STATIC_IP: ${LB_STATIC_IP}
+        PORT: "80"
 
   local-app:
     description: Start the application.

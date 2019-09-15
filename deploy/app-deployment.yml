@@ -32,6 +32,7 @@ metadata:
   name: web-app-service
 spec:
   type: LoadBalancer
+  loadBalancerIP: {{LB_STATIC_IP}}
   ports:
     - port: 80
       targetPort: 80

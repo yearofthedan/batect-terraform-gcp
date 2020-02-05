@@ -3,3 +3,4 @@
 */**.tfplan
 secret
 .DS_Store
+node_modules
